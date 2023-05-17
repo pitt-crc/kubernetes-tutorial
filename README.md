@@ -168,6 +168,7 @@ A deployment manifest is provided in this repository.
 In the example below we deploy the application into a namespace called `portainer`.
 
 ```
+minikube profile operations
 kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
 ```
 
@@ -177,11 +178,19 @@ Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch t
 kubectl get nodes -o wide
 ```
 
-
-
 minikube profile development
 kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
 
 
 minikube profile production
 kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
+
+### Deploying Argo CD
+
+
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
