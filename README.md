@@ -107,3 +107,19 @@ You should expect to receive output siomilar to the following:
 NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   6m23s   v1.26.3
 ```
+
+## Setting Up CD
+
+We will use portainer as out continuous deployment tool.
+A deployment manifest is provided in this repository.
+In the example below we deploy the application into a namespace called `portainer`.
+
+```
+kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
+```
+
+Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch the appropraite IP address.
+
+```
+kubectl get nodes -n portainer -o wide
+```
