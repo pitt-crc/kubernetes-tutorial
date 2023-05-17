@@ -1,4 +1,11 @@
 ---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: grafana
+  labels:
+    name: grafana
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
