@@ -121,5 +121,5 @@ kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/clus
 Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch the appropraite IP address.
 
 ```
-kubectl get nodes -n portainer -o wide
+kubectl get nodes -o wide
 ```
