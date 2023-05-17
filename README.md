@@ -1,19 +1,18 @@
 # CD DevOps Example
 
 This repository provides a getting started tutorial for setting up continuous deployment workflows with ArgoCD.
-Instructions are written for a
 
 ## System Setup
 
-The following section provides instructions for spinning up a development Kubernetes environment. 
+The following section provides instructions for setting up a development Kubernetes environment. 
 These instructions are not suitable for building a production ready system. 
 Examples are written for an x86-64 system running [Rocky Linux](https://rockylinux.org/). 
-Links are provide to the alternative installation instructions for other system configurations.
+Links are provided to the alternative installation instructions for other system configurations.
 
-## Installing Docker
+### Installing Docker
 
 Rocky linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker.
-The open source alternative Podman does come pre-installed on Rocky, but has some compatibility issues known campatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)). 
+The open source alternative Podman does come pre-installed on Rocky, but has some compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)). 
 
 ```bash
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -27,9 +26,9 @@ In order for your `docker` commands to execute with appropriate permissions, you
 sudo usermod -aG docker $USER && newgrp docker
 ```
 
-## Installing Kubectl
+### Installing Kubectl
 
-Some linux distributions come with Kubctl pre installed.
+Some linux distributions come with Kubectl pre installed.
 The following command can be used to check if it is already installed:
 
 ```bash
@@ -43,7 +42,7 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 
-## Installing Minikube
+### Installing Minikube
 
 Minikube is a lightweight Kubernetes distribution that runs locally on a single machine.
 See the [official instructions](https://minikube.sigs.k8s.io/docs/start/) for alternative architectures.
@@ -77,7 +76,7 @@ You will need to keep the service running for the rest of this tutorial, but the
 minikube stop
 ```
 
-## System Checks
+### System Checks
 
 You can check your Kubernetes cluster is ready to go using the `kubectl` utility. 
 
@@ -85,7 +84,7 @@ You can check your Kubernetes cluster is ready to go using the `kubectl` utility
 kubectl get nodes
 ```
 
-You should expect to recieve output siomilar to the following:
+You should expect to receive output siomilar to the following:
 
 ```
 NAME       STATUS   ROLES           AGE     VERSION
