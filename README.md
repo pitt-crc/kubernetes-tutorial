@@ -9,6 +9,9 @@ This repository provides a getting started tutorial for setting up continuous de
   - [Installing Kubectl](#installing-kubectl)
   - [Installing Minikube](#installing-minikube)
   - [System Checks](#system-checks)
+- [Setting Up Kubernetes](#setting-up-kubernetes)
+  - [Cluster Deployments](#cluster-deployments)
+  - [Deploying Portainer](#deploying-portainer)   
 
 
 ## System Setup
@@ -108,7 +111,57 @@ NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   6m23s   v1.26.3
 ```
 
-## Setting Up CD
+## Setting Up Kubernetes
+
+### Cluster Deployments
+
+For this tutorial we will spin up multiple kubernetes clusters.
+The `operations` cluster will be used to host administration and monitoring tools.
+The `development` and `production` environments will be used in our CI/CD examples later on.
+
+```bash
+minikube start -p operations --driver=docker --nodes=2
+minikube start -p development --driver=docker --nodes=2
+minikube start -p production --driver=docker --nodes=2
+```
+
+You can verify the setup executed correctly using the `profile` command:
+
+```bash 
+minikube profile list
+```
+
+The returned output should look similar to the following:
+
+```
+|-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
+|   Profile   | VM Driver | Runtime |      IP      | Port | Version | Status  | Nodes | Active |
+|-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
+| development | docker    | docker  | 192.168.58.2 | 8443 | v1.26.3 | Unknown |     2 |        |
+| operations  | docker    | docker  | 192.168.49.2 | 8443 | v1.26.3 | Unknown |     2 |        |
+| production  | docker    | docker  | 192.168.67.2 | 8443 | v1.26.3 | Unknown |     2 |        |
+|-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
+```
+
+The `minikube` commandline utility will only administrate a single cluster at a time.
+To switch change the default cluster, use the `profile` command.
+
+```bash
+minikube profile [CLUSTER]
+```
+
+It is important to note the above command will modify the default cluster used by the `minikube` **and** `kubectl` utilities.
+The `kubectl` has equivilent commands for changing the default cluster, but they will not effect the `minikube` utility.
+To avoid confusing situations where the two utilities are referencing different default clusters, it is recomended default clusters are set using `minikube`.
+
+The equivilent `kubectl` commands are provided below for reference.
+
+```
+kubectl config get-contexts 
+kubectl config use-context [CLUSTER]
+```
+
+### Deploying Portainer 
 
 We will use portainer as out continuous deployment tool.
 A deployment manifest is provided in this repository.
@@ -123,3 +176,12 @@ Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch t
 ```
 kubectl get nodes -o wide
 ```
+
+
+
+minikube profile development
+kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
+
+
+minikube profile production
+kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
