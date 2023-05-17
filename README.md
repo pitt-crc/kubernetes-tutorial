@@ -1,6 +1,15 @@
-# CD DevOps Example
+# Kubernetes DevOps Example
 
 This repository provides a getting started tutorial for setting up continuous deployment workflows with ArgoCD.
+
+## Table of Contents
+
+- [System Setup](#system-setup)
+  - [Installing Docker](#installing-docker)
+  - [Installing Kubectl](#installing-kubectl)
+  - [Installing Minikube](#installing-minikube)
+  - [System Checks](#system-checks)
+
 
 ## System Setup
 
