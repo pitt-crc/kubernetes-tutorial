@@ -193,10 +193,37 @@ kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.ya
 
 ### Deploying Argo CD
 
+ArgoCD is installed using the official installation manifest.
+In order to access the application GUI, the `argocd-server` service is to updated to a `NodePort` type.
 
-```
+```bash
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 
+The cluster IP can be found using the `manifest profile list` command.
+The port number for ArgoCD is found using `kubectl`:
+
+```
+kubectl get svc -n argocd
+
+NAME                                      TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+argocd-applicationset-controller          ClusterIP      10.104.235.186   <none>        7000/TCP,8080/TCP            3m52s
+argocd-dex-server                         ClusterIP      10.103.95.187    <none>        5556/TCP,5557/TCP,5558/TCP   3m52s
+argocd-metrics                            ClusterIP      10.109.192.232   <none>        8082/TCP                     3m52s
+argocd-notifications-controller-metrics   ClusterIP      10.103.20.126    <none>        9001/TCP                     3m52s
+argocd-redis                              ClusterIP      10.100.137.60    <none>        6379/TCP                     3m51s
+argocd-repo-server                        ClusterIP      10.99.41.34      <none>        8081/TCP,8084/TCP            3m51s
+argocd-server                             LoadBalancer   10.101.110.199   <pending>     80:30103/TCP,443:32420/TCP   3m51s
+argocd-server-metrics                     ClusterIP      10.103.145.178   <none>        8083/TCP                     3m51s
+```
+
+In the example above, the port number is 30103.
+
+Argo automatically creates an `admin` user with a random password.
+Use the following command to fetch the password:
+
+```bash
+echo $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+```
