@@ -72,7 +72,6 @@ curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest
 sudo rpm -Uvh minikube-latest.x86_64.rpm
 ```
 
-
 Use the ``start`` command to launch the cluster.
 In this example we use `docker` as the driver.
 This instructs `minikube` to create Kubernetes nodes as Docker containers.
@@ -125,6 +124,14 @@ minikube start -p development --driver=docker --nodes=2
 minikube start -p production --driver=docker --nodes=2
 ```
 
+When creating several nodes using Docker, your OS may run into inotify limits resulting in an error similar to `Failed to create control group inotify object: Too many open files`.
+This error (and similarly phrased errors) can be resolved by increasing the inotify watch limits:
+
+```bash
+sysctl fs.inotify.max_user_watches=1048576
+sysctl fs.inotify.max_user_instances=8192
+```
+
 You can verify the setup executed correctly using the `profile` command:
 
 ```bash 
@@ -143,8 +150,7 @@ The returned output should look similar to the following:
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
-The `minikube` commandline utility will only administrate a single cluster at a time.
-To switch change the default cluster, use the `profile` command.
+You can change the default cluster being administrated by `minikube` using the `profile` command
 
 ```bash
 minikube profile [CLUSTER]
