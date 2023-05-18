@@ -193,6 +193,14 @@ kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.ya
 
 ### Deploying Argo CD
 
+To install the CLI
+
+```bash
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+rm argocd-linux-amd64
+```
+
 ArgoCD is installed using the official installation manifest.
 In order to access the application GUI, the `argocd-server` service is to updated to a `NodePort` type.
 
