@@ -199,7 +199,6 @@ To install the CLI
 curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
-argocd login --core
 ```
 
 ArgoCD is installed using the official installation manifest.
@@ -235,4 +234,14 @@ Use the following command to fetch the password:
 
 ```bash
 echo $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+```
+
+#### Adding clusters to argo
+
+```argocd login --core```
+
+Although the configmap is in the argocd namespace, if argocd is not your current namespace, it won't work. To make sure it is, run :
+
+```bash
+kubectl config set-context --current --namespace=argocd
 ```
