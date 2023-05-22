@@ -139,6 +139,14 @@ sysctl fs.inotify.max_user_watches=1048576
 sysctl fs.inotify.max_user_instances=8192
 ```
 
+The above commands do not persist between reboots.
+For the changes to persist, you'll need to add the following lines to the appropriate configuration file in `/etc/sysctl.d/` (`99-inotify.conf` is a common choice).
+
+```conf
+fs.inotify.max_user_watches=1048576
+fs.inotify.max_user_instances=8192
+```
+
 After starting all three Minikube clusters, verify your setup using the `profile` command:
 
 ```bash 
