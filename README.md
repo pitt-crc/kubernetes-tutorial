@@ -207,16 +207,23 @@ done
 ```
 
 To visualize the collected metrics, we install grafana on the `operations` cluster.
-It is customary to install grafana in the `monitoring` namespace alongside Prometheus.
-However, we here use a seperate namespace `grafana` for easier teardown while coding experimentally:
+By default, Grafana does not persist it's data to disk.
+This means Grafana's data is lost each time the Grafana pod is terminated.
+Grafana can be configured to use a variety of storage types (see [the docs](https://grafana.com/docs/grafana/latest/setup-grafana/installation/kubernetes/) for more information).
+In this case we set up local storage using a Docker volume:
 
 ```bash
 minikube profile operations
-helm install grafana grafana/grafana --namespace grafana --create-namespace
+helm install grafana grafana/grafana \
+  --namespace grafana --create-namespace \
+  --set persistence.enabled=true \
+  --set persistence.storageClassName="" \
+  --set persistence.size=10Gi \
+  --set persistence.accessModes={ReadWriteOnce}
 ```
 
-Grafana will automatically create an `admin` user with a random password.
-Use the following command to fetch the generated password in plane text:
+As part of the installation process, Grafana will automatically create an `admin` user with a random password.
+Use the `kubectl` command to fetch the generated password and then decode it into plane text:
 
 ```bash
 kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
