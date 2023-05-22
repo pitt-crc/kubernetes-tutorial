@@ -12,7 +12,7 @@ This repository provides a getting started tutorial for setting up continuous de
   - [System Checks](#system-checks)
 - [Setting Up Kubernetes](#setting-up-kubernetes)
    - [Configuring Kubernetes](#configuring-kubernetes)
-    - [Notes on Minikube](#notes-on-minikube)
+     - [Notes on Minikube](#notes-on-minikube)
    - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
 - [CI/CD Deployments](#cicd-deployments)
   - [Deploying Portainer](#deploying-portainer)
