@@ -7,24 +7,29 @@ This repository provides a getting started tutorial for setting up continuous de
 - [System Setup](#system-setup)
   - [Installing Docker](#installing-docker)
   - [Installing Kubectl](#installing-kubectl)
+  - [Installing Helm](#installing-helm)
   - [Installing Minikube](#installing-minikube)
   - [System Checks](#system-checks)
 - [Setting Up Kubernetes](#setting-up-kubernetes)
   - [Cluster Deployments](#cluster-deployments)
-  - [Deploying Portainer](#deploying-portainer)   
-
+    - [Notes on Minikube](#notes-on-minikube)
+- [CI/CD Deployments](#cicd-deployments)
+  - [Deploying Portainer](#deploying-portainer)
+  - [Deploying Argo CD](#deploying-argo-cd)
+    - [Adding clusters to argo](#adding-clusters-to-argo)
 
 ## System Setup
 
 The following section provides instructions for setting up a development Kubernetes environment. 
 These instructions are not suitable for building a production ready system. 
-Examples are written for an x86-64 system running [Rocky Linux](https://rockylinux.org/). 
+Command line examples are written for an x86-64 system running [Rocky Linux](https://rockylinux.org/). 
 Links are provided to the alternative installation instructions for other system configurations.
 
 ### Installing Docker
 
 Rocky linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker.
-The open source alternative Podman does come pre-installed on Rocky, but has some compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)). 
+The open source alternative Podman does come pre-installed on Rocky, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)).
+Installing docker boils down to a few `dnf` commands:
 
 ```bash
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -32,7 +37,7 @@ sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo systemctl --now enable docker
 ```
 
-In order for your `docker` commands to execute with appropriate permissions, you will need to add your user to the `docker` group: 
+In order for `docker` to execute with the appropriate permissions, you will need to add your user to the `docker` group: 
 
 ```bash
 sudo usermod -aG docker $USER && newgrp docker
@@ -56,7 +61,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 ### Installing Helm
 
-The helm maintainers provide a useful setup script for automatically installing the `helm` utility:
+The Helm maintainers provide a useful setup script for automatically installing the `helm` utility:
 
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -65,7 +70,7 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ### Installing Minikube
 
 Minikube is a lightweight Kubernetes distribution that runs locally on a single machine.
-See the [official instructions](https://minikube.sigs.k8s.io/docs/start/) for alternative architectures.
+See the [official instructions](https://minikube.sigs.k8s.io/docs/start/) for architecture specific instructions.
 
 ```bash
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
@@ -82,7 +87,8 @@ minikube start --driver=docker
 minikube status
 ```
 
-Ingress is not enabled by default:
+Like most kubernetes installations, ingress is not enabled by default.
+You will need to enable the associated addon:
 
 ```bash
 minikube addons enable ingress
@@ -124,15 +130,16 @@ minikube start -p development --driver=docker --nodes=2
 minikube start -p production --driver=docker --nodes=2
 ```
 
-When creating several nodes using Docker, your OS may run into inotify limits resulting in an error similar to `Failed to create control group inotify object: Too many open files`.
-This error (and similarly phrased errors) can be resolved by increasing the inotify watch limits:
+When creating several nodes using Docker, your OS may run into `inotify` limits.
+This typically results in an error similar to `Failed to create control group inotify object: Too many open files` (the exact wording may vary).
+This error can be resolved by increasing the inotify watch limits:
 
 ```bash
 sysctl fs.inotify.max_user_watches=1048576
 sysctl fs.inotify.max_user_instances=8192
 ```
 
-You can verify the setup executed correctly using the `profile` command:
+After starting all three Minikube clusters, verify your setup using the `profile` command:
 
 ```bash 
 minikube profile list
@@ -145,12 +152,14 @@ The returned output should look similar to the following:
 |   Profile   | VM Driver | Runtime |      IP      | Port | Version | Status  | Nodes | Active |
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 | development | docker    | docker  | 192.168.58.2 | 8443 | v1.26.3 | Unknown |     2 |        |
-| operations  | docker    | docker  | 192.168.49.2 | 8443 | v1.26.3 | Unknown |     2 |        |
+| operations  | docker    | docker  | 192.168.49.2 | 8443 | v1.26.3 | Unknown |     2 | *      |
 | production  | docker    | docker  | 192.168.67.2 | 8443 | v1.26.3 | Unknown |     2 |        |
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
-You can change the default cluster being administrated by `minikube` using the `profile` command
+#### Notes on Minikube
+
+You can change the default cluster being administrated by `minikube` using the `profile` command:
 
 ```bash
 minikube profile [CLUSTER]
@@ -166,6 +175,8 @@ The equivilent `kubectl` commands are provided below for reference.
 kubectl config get-contexts 
 kubectl config use-context [CLUSTER]
 ```
+
+## CI/CD Deployments
 
 ### Deploying Portainer 
 
