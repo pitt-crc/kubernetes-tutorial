@@ -165,6 +165,40 @@ The returned output should look similar to the following:
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
+### Prometheus and Grafana
+
+We will use The Prometheus and Grafana utilities to monitor/visualize the status of each cluster.
+Start by adding the appropriate repositories to Helm:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+```
+
+Prometheus and Grafana can bothe be installed via helm.
+For organization purposes, both applications are installed into a namespace called `monitoring`.
+
+```bash
+kubectl create ns monitoring
+helm install prometheus-operator prometheus-community/kube-prometheus-stack --namespace monitoring
+helm install grafana grafana/grafana --namespace monitoring
+```
+
+Grafan will automatically create an `admin` user with a random password.
+Use the following command to fetch the generated password in plane text:
+
+```bash
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+
+To access Grafana, expose the node the service on port 3000:
+
+```bash
+ export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+     kubectl --namespace monitoring port-forward $POD_NAME 3000
+```
+
 #### Notes on Minikube
 
 You can change the default cluster being administrated by `minikube` using the `profile` command:
