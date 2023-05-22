@@ -180,7 +180,7 @@ To avoid confusing situations where the two utilities are referencing different 
 
 The equivilent `kubectl` commands are provided below for reference.
 
-```
+```bash
 kubectl config get-contexts 
 kubectl config use-context [CLUSTER]
 ```
@@ -196,39 +196,47 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 ```
 
-Prometheus and Grafana can bothe be installed via helm.
-For organization purposes, both applications are installed into a namespace called `monitoring`.
+Prometheus needs to be installed on each cluster you want to collect metrics for.
+In the example below, we install Prometheus on all of the clusters we created earlier:
 
 ```bash
-kubectl create ns monitoring
-helm install prometheus-operator prometheus-community/kube-prometheus-stack --namespace monitoring
-helm install grafana grafana/grafana --namespace monitoring
+for CLUSTER in operations development production; do
+  minikube profile $CLUSTER
+  helm install prometheus-operator prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+done
 ```
 
-Grafan will automatically create an `admin` user with a random password.
+To visualize the collected metrics, we install grafana on the `operations` cluster.
+It is customary to install grafana in the `monitoring` namespace alongside Prometheus.
+However, we here use a seperate namespace `grafana` for easier teardown while coding experimentally:
+
+```bash
+minikube profile operations
+helm install grafana grafana/grafana --namespace grafana --create-namespace
+```
+
+Grafana will automatically create an `admin` user with a random password.
 Use the following command to fetch the generated password in plane text:
 
 ```bash
-kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
 
 To access Grafana, expose the node the service on port 3000:
 
 ```bash
- export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
-     kubectl --namespace monitoring port-forward $POD_NAME 3000
+export POD_NAME=$(kubectl get pods --namespace grafana -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace grafana port-forward $POD_NAME 3000
 ```
 
 After logging in to Grafana, the service can be configured in the standard fashion.
-configure a new Prometheus data source.
-
-General format:
+URLS for each Prometheus installation follow the following general format:
 
 ```
 http://<prometheus-service-name>.<namespace>.svc.cluster.local:<prometheus-port>
 ```
 
-Should be:
+For the operations cluster this should be:
 
 ```
 http://prometheus-operated.monitoring.svc.cluster.local:9090
