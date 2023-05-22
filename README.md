@@ -11,8 +11,9 @@ This repository provides a getting started tutorial for setting up continuous de
   - [Installing Minikube](#installing-minikube)
   - [System Checks](#system-checks)
 - [Setting Up Kubernetes](#setting-up-kubernetes)
-  - [Cluster Deployments](#cluster-deployments)
+   - [Configuring Kubernetes](#configuring-kubernetes)
     - [Notes on Minikube](#notes-on-minikube)
+   - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
 - [CI/CD Deployments](#cicd-deployments)
   - [Deploying Portainer](#deploying-portainer)
   - [Deploying Argo CD](#deploying-argo-cd)
@@ -118,7 +119,7 @@ minikube   Ready    control-plane   6m23s   v1.26.3
 
 ## Setting Up Kubernetes
 
-### Cluster Deployments
+### Configuring Kubernetes
 
 For this tutorial we will spin up multiple kubernetes clusters.
 The `operations` cluster will be used to host administration and monitoring tools.
@@ -165,7 +166,26 @@ The returned output should look similar to the following:
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
-### Prometheus and Grafana
+#### Notes on Minikube
+
+You can change the default cluster being administrated by `minikube` using the `profile` command:
+
+```bash
+minikube profile [CLUSTER]
+```
+
+It is important to note the above command will modify the default cluster used by the `minikube` **and** `kubectl` utilities.
+The `kubectl` has equivilent commands for changing the default cluster, but they will not effect the `minikube` utility.
+To avoid confusing situations where the two utilities are referencing different default clusters, it is recomended default clusters are set using `minikube`.
+
+The equivilent `kubectl` commands are provided below for reference.
+
+```
+kubectl config get-contexts 
+kubectl config use-context [CLUSTER]
+```
+
+### Cluster Monitoring (Prometheus and Grafana)
 
 We will use The Prometheus and Grafana utilities to monitor/visualize the status of each cluster.
 Start by adding the appropriate repositories to Helm:
@@ -199,23 +219,19 @@ To access Grafana, expose the node the service on port 3000:
      kubectl --namespace monitoring port-forward $POD_NAME 3000
 ```
 
-#### Notes on Minikube
+After logging in to Grafana, the service can be configured in the standard fashion.
+configure a new Prometheus data source.
 
-You can change the default cluster being administrated by `minikube` using the `profile` command:
-
-```bash
-minikube profile [CLUSTER]
-```
-
-It is important to note the above command will modify the default cluster used by the `minikube` **and** `kubectl` utilities.
-The `kubectl` has equivilent commands for changing the default cluster, but they will not effect the `minikube` utility.
-To avoid confusing situations where the two utilities are referencing different default clusters, it is recomended default clusters are set using `minikube`.
-
-The equivilent `kubectl` commands are provided below for reference.
+General format:
 
 ```
-kubectl config get-contexts 
-kubectl config use-context [CLUSTER]
+http://<prometheus-service-name>.<namespace>.svc.cluster.local:<prometheus-port>
+```
+
+Should be:
+
+```
+http://prometheus-operated.monitoring.svc.cluster.local:9090
 ```
 
 ## CI/CD Deployments
