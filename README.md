@@ -53,7 +53,7 @@ The following command can be used to check if it is already installed:
 kubectl version --client
 ```
 
-Following the official [Kubernetes documentation], the latest version can be installed as follows: 
+Following the official [Kubernetes documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/), the latest version can be installed as follows: 
 
 ```bash
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -166,6 +166,16 @@ The returned output should look similar to the following:
 |-------------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
+Like most kubernetes installations, ingress is not enabled by default.
+You will need to enable the associated addon for each cluster:
+
+```bash
+for profile in operations development production; do
+   minikube profile $profile
+   minikube addons enable ingress
+done
+```
+
 #### Notes on Minikube
 
 You can change the default cluster being administrated by `minikube` using the `profile` command:
@@ -257,14 +267,14 @@ We will use portainer as out continuous deployment tool.
 A deployment manifest is provided in this repository.
 In the example below we deploy the application into a namespace called `portainer`.
 
-```
+```bash
 minikube profile operations
 kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
 ```
 
 Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch the appropraite IP address.
 
-```
+```bash
 kubectl get nodes -o wide
 ```
 
