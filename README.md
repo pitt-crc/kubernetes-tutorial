@@ -23,13 +23,13 @@ This repository provides a getting started tutorial for setting up continuous de
 
 The following section provides instructions for setting up a development Kubernetes environment. 
 These instructions are not suitable for building a production ready system. 
-Command line examples are written for an x86-64 system running [Rocky Linux](https://rockylinux.org/). 
-Links are provided to the alternative installation instructions for other system configurations.
+Command line examples are written for an x86 system running [Rocky Linux 9](https://rockylinux.org/). 
+Links are provided to alternative installation instructions for other system configurations.
 
 ### Installing Docker
 
 Rocky linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker.
-The open source alternative Podman does come pre-installed on Rocky, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)).
+The open source alternative Podman may come pre-installed on some systems, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)).
 Installing docker boils down to a few `dnf` commands:
 
 ```bash
@@ -46,8 +46,7 @@ sudo usermod -aG docker $USER && newgrp docker
 
 ### Installing Kubectl
 
-Some linux distributions come with Kubectl pre installed.
-The following command can be used to check if it is already installed:
+The following command can be used to check if `kubectl` is already installed:
 
 ```bash
 kubectl version --client
