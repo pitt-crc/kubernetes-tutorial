@@ -11,9 +11,8 @@ This repository provides a getting started tutorial for setting up continuous de
   - [Installing Minikube](#installing-minikube)
   - [System Checks](#system-checks)
 - [Setting Up Kubernetes](#setting-up-kubernetes)
-   - [Configuring Kubernetes](#configuring-kubernetes)
-     - [Notes on Minikube](#notes-on-minikube)
-   - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
+  - [Configuring Kubernetes](#configuring-kubernetes)
+  - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
 - [CI/CD Deployments](#cicd-deployments)
   - [Deploying Portainer](#deploying-portainer)
   - [Deploying Argo CD](#deploying-argo-cd)
@@ -28,9 +27,12 @@ Links are provided to alternative installation instructions for other system con
 
 ### Installing Docker
 
-Rocky linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker.
-The open source alternative Podman may come pre-installed on some systems, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)).
-Installing docker boils down to a few `dnf` commands:
+Docker is used to packaging and deployment software applications as portable,  self-sufficient containers. Rocky Linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker within Rocky OS.
+For installation instructions on other platforms, see the official [Docker documentation](https://docs.docker.com/engine/install/).
+
+**Note:** The open source alternative Podman comes pre-installed on many systems, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)). Podman is not recommended when following this tutorial.
+
+Installing docker is accomplished using a few `dnf` commands:
 
 ```bash
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -46,7 +48,7 @@ sudo usermod -aG docker $USER && newgrp docker
 
 ### Installing Kubectl
 
-The following command can be used to check if `kubectl` is already installed:
+Kubectl is a command-line tool used to manage Kubernetes clusters. The following command can be used to check if `kubectl` is already installed:
 
 ```bash
 kubectl version --client
@@ -61,7 +63,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 ### Installing Helm
 
-The Helm maintainers provide a useful setup script for automatically installing the `helm` utility:
+Helm is a package manager for Kubernetes. The Helm maintainers provide a useful setup script for automatically installing the `helm` utility:
 
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -70,7 +72,7 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ### Installing Minikube
 
 Minikube is a lightweight Kubernetes distribution that runs locally on a single machine.
-See the [official instructions](https://minikube.sigs.k8s.io/docs/start/) for architecture specific instructions.
+See the [official instructions](https://minikube.sigs.k8s.io/docs/start/) for architecture specific installation instructions. On x86 platforms, the latest version can be installed as follows: 
 
 ```bash
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
