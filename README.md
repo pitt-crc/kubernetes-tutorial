@@ -95,6 +95,7 @@ This instructs `minikube` to create Kubernetes nodes as Docker containers instea
 
 ```bash
 minikube start -p tutorial --driver=docker --nodes=4
+minikube profile tutorial  # set the tutorial cluster as the current default cluster
 ```
 
 When using Docker as a driver, your OS may run into `inotify` limits.
@@ -126,7 +127,7 @@ The returned output should look similar to the following:
 |----------|-----------|---------|--------------|------|---------|---------|-------|--------|
 | Profile  | VM Driver | Runtime |      IP      | Port | Version | Status  | Nodes | Active |
 |----------|-----------|---------|--------------|------|---------|---------|-------|--------|
-| tutorial | docker    | docker  | 192.168.58.2 | 8443 | v1.26.3 | Unknown |     2 |        |
+| tutorial | docker    | docker  | 192.168.58.2 | 8443 | v1.26.3 | Unknown |     4 |     *  |
 |----------|-----------|---------|--------------|------|---------|---------|-------|--------|
 ```
 
@@ -158,22 +159,15 @@ A deployment manifest is provided in this repository.
 In the example below we deploy the application into a namespace called `portainer`.
 
 ```bash
-minikube profile operations
+minikube profile tutorial
 kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
 ```
 
 Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch the appropraite IP address.
 
 ```bash
-kubectl get nodes -o wide
+kubectl get service -n portainer
 ```
-
-minikube profile development
-kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
-
-
-minikube profile production
-kubectl apply -f https://downloads.portainer.io/ee2-18/portainer-agent-k8s-lb.yaml
 
 ### Deploying Argo CD
 
