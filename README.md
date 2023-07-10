@@ -159,7 +159,7 @@ minikube profile tutorial
 kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
 ```
 
-Portainer is exposed with/without SSL on ports 30779/30777. Minikube provides a convenient command for fetching the URL for a given service:
+Portainer is exposed with/without SSL on ports 30779/30777. Minikube provides a convenient command for fetching the URL for a given service (they also provide some very well written [docs](https://minikube.sigs.k8s.io/docs/handbook/accessing/):
 
 ```bash
 minikube service portainer -n portainer --url
