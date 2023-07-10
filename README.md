@@ -159,10 +159,18 @@ minikube profile tutorial
 kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
 ```
 
-Portainer with/wiothout SSL on ports 30779/30777. The command below will fetch the appropraite IP address.
+Portainer is exposed with/without SSL on ports 30779/30777. Minikube provides a convenient command for fetching the URL for a given service:
 
 ```bash
-kubectl get service -n portainer
+minikube service portainer -n portainer --url
+```
+
+The Porainer web interface will walk you through license verification and preliminary setup.
+If this process is not completed within a certain amunt of time, Portainer will disable itself to prevent access by malicious actors. 
+The solution is to restart your `portainer` deployment (which should be running in the `portainer` namespace) using the following command:
+
+```bash
+kubectl rollout restart deployment portainer -n portainer
 ```
 
 ### Deploying Argo CD
