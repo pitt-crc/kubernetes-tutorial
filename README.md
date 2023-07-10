@@ -155,8 +155,7 @@ A deployment manifest is provided in this repository.
 In the example below we deploy the application into a namespace called `portainer`.
 
 ```bash
-minikube profile tutorial
-kubectl apply -n portainer -f https://raw.githubusercontent.com/djperrefort/cluster/main/portainer/portainer.yml
+kubectl apply -n portainer -f https://downloads.portainer.io/ee2-18/portainer.yaml
 ```
 
 Portainer is exposed with/without SSL on ports 30779/30777. Minikube provides a convenient command for fetching the URL for a given service (they also provide some very well written [docs](https://minikube.sigs.k8s.io/docs/handbook/accessing/):
