@@ -20,10 +20,9 @@ This repository provides a getting started tutorial for setting up continuous de
 
 ## System Setup
 
-The following section provides instructions for setting up a development Kubernetes environment. 
-These instructions are not suitable for building a production ready system. 
+The following section provides instructions for setting up a development Kubernetes environment and are not suitable for building a production ready system. 
 Command line examples are written for an x86 system running [Rocky Linux 9](https://rockylinux.org/). 
-Links are provided to alternative installation instructions for other system configurations.
+Links are provided to alternative instructions for other system configurations.
 
 For this tutorial, you will need the following software stack available on your machine:
 
@@ -34,7 +33,7 @@ For this tutorial, you will need the following software stack available on your 
 
 ### Installing Docker
 
-Docker is used to package and deploy software as portable,  self-sufficient containers. Rocky Linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker within Rocky OS.
+Docker is used to package and deploy software as portable, self-sufficient containers. Rocky Linux maintains [official instructions](https://docs.rockylinux.org/gemstones/docker/) for installing docker within Rocky OS.
 For installation instructions on other platforms, see the official [Docker documentation](https://docs.docker.com/engine/install/).
 
 **Note:** The open source alternative Podman comes pre-installed on many systems, but has compatibility issues with the tools we will be using later on ([for example](https://github.com/kubernetes/minikube/issues/9120)). Podman is not recommended when following this tutorial.
@@ -55,12 +54,7 @@ sudo usermod -aG docker $USER && newgrp docker
 
 ### Installing Kubectl
 
-Kubectl is a command-line tool used to manage Kubernetes clusters. Use the following command to check if `kubectl` is already installed:
-
-```bash
-kubectl version --client
-```
-
+Kubectl is a command-line tool used to manage Kubernetes clusters.
 Following the official [Kubernetes documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/), the latest version can be installed as follows: 
 
 ```bash
@@ -90,7 +84,9 @@ sudo rpm -Uvh minikube-latest.x86_64.rpm
 
 ### Configuring Kubernetes
 
-For this tutorial we will use Minikube to create a single Kubernetes cluster called `tutorial`.  Use the ``start`` demonstrated below to configure and launch a new cluster. Note the usage of `docker` as the driver.
+For this tutorial we will use Minikube to create a single Kubernetes cluster called `tutorial`.
+Use the ``start`` demonstrated below to configure and launch a new cluster.
+Note the usage of `docker` as the driver.
 This instructs `minikube` to create Kubernetes nodes as Docker containers instead of running nodes on extra physical/virtual machines.
 
 ```bash
@@ -100,7 +96,7 @@ minikube profile tutorial  # set the tutorial cluster as the current default clu
 
 When using Docker as a driver, your OS may run into `inotify` limits.
 This typically results in an error similar to `Failed to create control group inotify object: Too many open files` (the exact wording may vary).
-This error can be resolved by increasing the inotify watch limits:
+The error can be resolved by increasing the inotify watch limits:
 
 ```bash
 sysctl fs.inotify.max_user_watches=1048576
@@ -115,7 +111,7 @@ fs.inotify.max_user_watches=1048576
 fs.inotify.max_user_instances=8192
 ```
 
-After starting all three Minikube clusters, verify your setup using the `profile` command.
+After starting the Minikube cluster, verify your setup using the `profile` command.
 
 ```bash 
 minikube profile list
@@ -140,7 +136,7 @@ minikube addons enable ingress
 
 ### Notes on Minikube
 
-If You can change the default cluster being administrated by `minikube` using the `profile` command:
+You can change the default cluster being administrated by `minikube` using the `profile` command:
 
 ```bash
 minikube profile [CLUSTER]
