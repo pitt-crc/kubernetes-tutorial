@@ -15,7 +15,6 @@ This repository provides a getting started tutorial for setting up continuous de
   - [Notes on Minikube](#notes-on-minikube)
 - [CI/CD Deployments](#cicd-deployments)
   - [Deploying Portainer](#deploying-portainer)
-  - [Deploying Argo CD](#deploying-argo-cd)
   - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
 
 ## System Setup
@@ -170,51 +169,6 @@ The solution is to restart your `portainer` deployment (which should be running 
 
 ```bash
 kubectl rollout restart deployment portainer -n portainer
-```
-
-### Deploying Argo CD
-
-To install the CLI
-
-```bash
-curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-rm argocd-linux-amd64
-```
-
-ArgoCD is installed using the official installation manifest.
-In order to access the application GUI, the `argocd-server` service is to updated to a `NodePort` type.
-
-```bash
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
-```
-
-The cluster IP can be found using the `manifest profile list` command.
-The port number for ArgoCD is found using `kubectl`:
-
-```
-kubectl get svc -n argocd
-
-NAME                                      TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
-argocd-applicationset-controller          ClusterIP      10.104.235.186   <none>        7000/TCP,8080/TCP            3m52s
-argocd-dex-server                         ClusterIP      10.103.95.187    <none>        5556/TCP,5557/TCP,5558/TCP   3m52s
-argocd-metrics                            ClusterIP      10.109.192.232   <none>        8082/TCP                     3m52s
-argocd-notifications-controller-metrics   ClusterIP      10.103.20.126    <none>        9001/TCP                     3m52s
-argocd-redis                              ClusterIP      10.100.137.60    <none>        6379/TCP                     3m51s
-argocd-repo-server                        ClusterIP      10.99.41.34      <none>        8081/TCP,8084/TCP            3m51s
-argocd-server                             LoadBalancer   10.101.110.199   <pending>     80:30103/TCP,443:32420/TCP   3m51s
-argocd-server-metrics                     ClusterIP      10.103.145.178   <none>        8083/TCP                     3m51s
-```
-
-In the example above, the port number is 30103.
-
-Argo automatically creates an `admin` user with a random password.
-Use the following command to fetch the password:
-
-```bash
-echo $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
 ### Cluster Monitoring (Prometheus and Grafana)
