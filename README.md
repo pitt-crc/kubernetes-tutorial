@@ -1,21 +1,24 @@
 # Kubernetes DevOps Example
 
-This repository provides a getting started tutorial for setting up continuous deployment workflows with ArgoCD.
+A tutorial for configuring GitOps driven deployments to a development Kubernetes cluster.
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [System Setup](#system-setup)
   - [Installing Docker](#installing-docker)
   - [Installing Kubectl](#installing-kubectl)
   - [Installing Helm](#installing-helm)
   - [Installing Minikube](#installing-minikube)
-  - [System Checks](#system-checks)
-- [Setting Up Kubernetes](#setting-up-kubernetes)
+- [Setting Up the Cluster](#setting-up-the-cluster)
   - [Configuring Kubernetes](#configuring-kubernetes)
-  - [Notes on Minikube](#notes-on-minikube)
-- [CI/CD Deployments](#cicd-deployments)
   - [Deploying Portainer](#deploying-portainer)
+- [CI/CD Deployments](#cicd-deployments)
   - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
+
+## Overview
+
+TODO
 
 ## System Setup
 
@@ -79,7 +82,7 @@ curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest
 sudo rpm -Uvh minikube-latest.x86_64.rpm
 ```
 
-## Setting Up Kubernetes
+## Setting Up the Cluster
 
 ### Configuring Kubernetes
 
@@ -133,43 +136,32 @@ You will need to enable the associated addon for each cluster:
 minikube addons enable ingress
 ```
 
-### Notes on Minikube
+### Deploying Portainer
 
-You can change the default cluster being administrated by `minikube` using the `profile` command:
-
-```bash
-minikube profile [CLUSTER]
-```
-
-It is important to note the above command will modify the default cluster used by the `minikube` **and** `kubectl` utilities.
-The `kubectl` utility has equivalent commands for changing the default cluster, but they will **not** effect the `minikube` utility.
-To avoid confusing situations where the two utilities are referencing different default clusters, it is recommended to switch between clusters using `minikube`.
-
-## CI/CD Deployments
-
-### Deploying Portainer 
-
-We will use portainer as out continuous deployment tool.
-A deployment manifest is provided in this repository.
-In the example below we deploy the application into a namespace called `portainer`.
+We will use portainer as our GitOps / continuous deployment tool.
+The Portainer provides a default manifest for deploying portainer to a new cluster.
+To promote organization, the example below deploys the application into a namespace called `portainer`.
 
 ```bash
 kubectl apply -n portainer -f https://downloads.portainer.io/ee2-18/portainer.yaml
 ```
 
-Portainer is exposed with/without SSL on ports 30779/30777. Minikube provides a convenient command for fetching the URL for a given service (they also provide some very well written [docs](https://minikube.sigs.k8s.io/docs/handbook/accessing/):
+Portainer is exposed with/without SSL on ports 30779/30777.
+Minikube provides a convenient command for fetching the URL for a given service (they also provide some very well written [docs](https://minikube.sigs.k8s.io/docs/handbook/accessing/):
 
 ```bash
 minikube service portainer -n portainer --url
 ```
 
-The Porainer web interface will walk you through license verification and preliminary setup.
-If this process is not completed within a certain amunt of time, Portainer will disable itself to prevent access by malicious actors. 
+The Portainer web interface will walk you through license verification and preliminary setup.
+If this process is not completed within a certain amount of time, Portainer will disable itself to prevent access by malicious actors.
 The solution is to restart your `portainer` deployment (which should be running in the `portainer` namespace) using the following command:
 
 ```bash
 kubectl rollout restart deployment portainer -n portainer
 ```
+
+## CI/CD Deployments
 
 ### Cluster Monitoring (Prometheus and Grafana)
 
@@ -193,7 +185,7 @@ done
 ```
 
 To visualize the collected metrics, we install grafana on the `operations` cluster.
-By default, Grafana does not persist it's data to disk.
+By default, Grafana does not persist its data to disk.
 This means Grafana's data is lost each time the Grafana pod is terminated.
 Grafana can be configured to use a variety of storage types (see [the docs](https://grafana.com/docs/grafana/latest/setup-grafana/installation/kubernetes/) for more information).
 In this case we set up local storage using a Docker volume:
