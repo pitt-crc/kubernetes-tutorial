@@ -16,7 +16,8 @@ A tutorial for configuring GitOps driven deployments to a development Kubernetes
 
 ## Overview
 
-TODO
+This tutorial walks through the creation of a local, virtualized Kubernetes cluster using Minikube.
+Instructions are included for getting a development ArgoCD installation running on the cluster.
 
 ## System Setup
 
