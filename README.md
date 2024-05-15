@@ -12,9 +12,7 @@ A tutorial for configuring GitOps driven deployments to a development Kubernetes
   - [Installing Minikube](#installing-minikube)
 - [Setting Up the Cluster](#setting-up-the-cluster)
   - [Configuring Kubernetes](#configuring-kubernetes)
-  - [Deploying Portainer](#deploying-portainer)
-- [CI/CD Deployments](#cicd-deployments)
-  - [Cluster Monitoring (Prometheus and Grafana)](#cluster-monitoring-prometheus-and-grafana)
+  - [Deploying Argo CD](#deploying-argo-cd)
 
 ## Overview
 
@@ -135,95 +133,43 @@ You will need to enable the associated addon for each cluster:
 ```bash
 minikube addons enable ingress
 ```
+### Deploying Argo CD
 
-### Deploying Portainer
-
-We will use portainer as our GitOps / continuous deployment tool.
-The Portainer provides a default manifest for deploying portainer to a new cluster.
-To promote organization, the example below deploys the application into a namespace called `portainer`.
+We will use Argo CD as our GitOps / continuous deployment tool.
+Following the [official docs](https://argo-cd.readthedocs.io/en/stable/getting_started/), we install the official manifest.
 
 ```bash
-kubectl apply -n portainer -f https://downloads.portainer.io/ee2-18/portainer.yaml
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
-Portainer is exposed with/without SSL on ports 30779/30777.
-Minikube provides a convenient command for fetching the URL for a given service (they also provide some very well written [docs](https://minikube.sigs.k8s.io/docs/handbook/accessing/):
+In order to access the application GUI, the `argocd-server` service is to updated to a `NodePort` type.
 
 ```bash
-minikube service portainer -n portainer --url
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 
-The Portainer web interface will walk you through license verification and preliminary setup.
-If this process is not completed within a certain amount of time, Portainer will disable itself to prevent access by malicious actors.
-The solution is to restart your `portainer` deployment (which should be running in the `portainer` namespace) using the following command:
+The cluster IP can be found using the `manifest profile list` command.
+The port number for ArgoCD is found using `kubectl`:
+
+```
+kubectl get svc -n argocd
+NAME                                      TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+argocd-applicationset-controller          ClusterIP      10.104.235.186   <none>        7000/TCP,8080/TCP            3m52s
+argocd-dex-server                         ClusterIP      10.103.95.187    <none>        5556/TCP,5557/TCP,5558/TCP   3m52s
+argocd-metrics                            ClusterIP      10.109.192.232   <none>        8082/TCP                     3m52s
+argocd-notifications-controller-metrics   ClusterIP      10.103.20.126    <none>        9001/TCP                     3m52s
+argocd-redis                              ClusterIP      10.100.137.60    <none>        6379/TCP                     3m51s
+argocd-repo-server                        ClusterIP      10.99.41.34      <none>        8081/TCP,8084/TCP            3m51s
+argocd-server                             LoadBalancer   10.101.110.199   <pending>     80:30103/TCP,443:32420/TCP   3m51s
+argocd-server-metrics                     ClusterIP      10.103.145.178   <none>        8083/TCP                     3m51s
+```
+
+In the example above, the port number is 30103.
+
+Argo automatically creates an `admin` user with a random password.
+Use the following command to fetch the password:
 
 ```bash
-kubectl rollout restart deployment portainer -n portainer
+echo $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
-
-## CI/CD Deployments
-
-### Cluster Monitoring (Prometheus and Grafana)
-
-We will use The Prometheus and Grafana utilities to monitor/visualize the status of each cluster.
-Start by adding the appropriate repositories to Helm:
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-```
-
-Prometheus needs to be installed on each cluster you want to collect metrics for.
-In the example below, we install Prometheus on all of the clusters we created earlier:
-
-```bash
-for CLUSTER in operations development production; do
-  minikube profile $CLUSTER
-  helm install prometheus-operator prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
-done
-```
-
-To visualize the collected metrics, we install grafana on the `operations` cluster.
-By default, Grafana does not persist its data to disk.
-This means Grafana's data is lost each time the Grafana pod is terminated.
-Grafana can be configured to use a variety of storage types (see [the docs](https://grafana.com/docs/grafana/latest/setup-grafana/installation/kubernetes/) for more information).
-In this case we set up local storage using a Docker volume:
-
-```bash
-minikube profile operations
-helm install grafana grafana/grafana \
-  --namespace grafana --create-namespace \
-  --set persistence.enabled=true \
-  --set persistence.storageClassName="" \
-  --set persistence.size=10Gi \
-  --set persistence.accessModes={ReadWriteOnce}
-```
-
-As part of the installation process, Grafana will automatically create an `admin` user with a random password.
-Use the `kubectl` command to fetch the generated password and then decode it into plane text:
-
-```bash
-kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-```
-
-To access Grafana, expose the node the service on port 3000:
-
-```bash
-export POD_NAME=$(kubectl get pods --namespace grafana -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
-kubectl --namespace grafana port-forward $POD_NAME 3000
-```
-
-After logging in to Grafana, the service can be configured in the standard fashion.
-URLS for each Prometheus installation follow the following general format:
-
-```
-http://<prometheus-service-name>.<namespace>.svc.cluster.local:<prometheus-port>
-```
-
-For the operations cluster this should be:
-
-```
-http://prometheus-operated.monitoring.svc.cluster.local:9090
-```
-
