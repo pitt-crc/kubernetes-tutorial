@@ -152,8 +152,13 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 The cluster IP can be found using the `manifest profile list` command.
 The port number for ArgoCD is found using `kubectl`:
 
-```
+```bash
 kubectl get svc -n argocd
+```
+
+The output will look similar to the following:
+
+```
 NAME                                      TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
 argocd-applicationset-controller          ClusterIP      10.104.235.186   <none>        7000/TCP,8080/TCP            3m52s
 argocd-dex-server                         ClusterIP      10.103.95.187    <none>        5556/TCP,5557/TCP,5558/TCP   3m52s
